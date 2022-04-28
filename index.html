@@ -9,25 +9,18 @@
   </head>
 
   <body>
-    <h1>Shop</h1>
-    <div class="items container">
-      <h5>Items 🏷️</h5>
-      <ul id="items"></ul>
+    <div id="header" class="header"></div>
+    <div class="products">
+      <div class="products" id="items"></div>
     </div>
     
-    <div  id="itemsCart"class="cart container">
-      <h5>Cart 🛒</h5>
-      <ul id="cart"></ul>
-      <h2 id="clear">clear</h2>
-    </div>
+    <div id="itemsCart" class="container">
+      <div id="cart" class="cart"></div>
 
-    <div class="container">
-    <h5>Cost 💳</h5>
-    <div class="payment-breakdown ">
-      <div id="payment-breakdown"></div>
-    </div>
     <div class="payment">
       <div id="payment"></div>
+      <div class="clear-noDis" id="clear">Clear</div>
+      <div class="discount" id="discount">-10%</div>
     </div>
     <script src="store.js"></script>
   </body>

@@ -1,16 +1,18 @@
 const itemsUl = document.getElementById("items");
 const cartUl = document.getElementById("cart");
 const price = document.getElementById("payment");
-const breakdown = document.getElementById("payment-breakdown");
 const clear = document.getElementById("clear");
-itemsCart = document.getElementById("itemsCart");
+const itemsCart = document.getElementById("itemsCart");
 const store = localStorage.getItem("store");
 let items = [];
 clear.onclick = () => {
   localStorage.removeItem("store");
-  console.log("cleared");
   fillItems();
-  rerender();
+  try {
+    rerender();
+  } catch (error) {
+    setTimeout(() => fillItems(), "1000");
+  }
 };
 itemsCart.appendChild(clear);
 
@@ -19,11 +21,22 @@ fillItems();
 async function getItems() {
   const res = await fetch("https://fakestoreapi.com/products");
   const data = await res.json();
-  data.forEach((item) => (item.quantity = 10));
   console.log(data);
+  data.forEach((item) => (item.quantity = 10));
   itemsSet = [
     await data.forEach((item) =>
-      items.push(createItem(item.id, item.title, item.price, item.quantity))
+      items.push(
+        createItem(
+          item.id,
+          item.title,
+          item.price,
+          item.quantity,
+          item.category,
+          item.description,
+          item.image,
+          item.rating
+        )
+      )
     ),
   ];
   createItemList(items);
@@ -33,7 +46,6 @@ function fillItems() {
   items = [];
   if (store && store[2]) {
     items = JSON.parse(localStorage.getItem("store"));
-    console.log(items);
     createItemList(items);
     rerender();
   } else {
@@ -41,25 +53,47 @@ function fillItems() {
   }
 }
 
-function createItem(id, title, price, quantity, amount = 0) {
+function createItem(
+  id,
+  title,
+  price,
+  quantity,
+  category,
+  description,
+  image,
+  rating,
+  amount = 0
+) {
   return {
-    id: id,
-    title: title,
-    price: price,
-    amount: amount,
+    id,
+    title,
+    price,
     quantity,
+    category,
+    description,
+    image,
+    rating,
+    amount,
   };
 }
 
-function createItemList(arr) {
+async function createItemList(arr) {
   itemsUl.innerHTML = "";
-  arr.forEach((item) => {
-    let itemRow = document.createElement("li");
-    itemRow.innerText = `${item.title} | ${item.price}$ | ${item.quantity} Items left`;
-    itemRow.id = `${item.barcod}`;
-    if (item.quantity <= 0) {
-      itemRow.className = "grey";
-    }
+  await arr.forEach((item) => {
+    let itemRow = document.createElement("div");
+    itemRow.className = "product-card";
+    itemRow.innerHTML = `
+    <div class="product-image">
+      <img width="100" 
+      height="150" src=${item.image} alt="" />
+    </div>
+    <div class="product-info">
+      <h4> ${item.title} </h4> <h5> ${item.price} </h5>
+      <h6>
+        ✰${item.rating.rate} Sold:${item.rating.count}
+      </h6>
+    </div>
+  `;
     itemRow.onclick = () => {
       if (item.quantity > 0) {
         item.amount++;
@@ -75,9 +109,10 @@ function createCartList(arr) {
   cartUl.innerHTML = "";
   arr.forEach((item) => {
     if (item.amount > 0) {
-      let cartRow = document.createElement("li");
-      cartRow.innerText = `${item.title} | ${item.amount}`;
-      cartRow.id = `${item.barcod}`;
+      let cartRow = document.createElement("div");
+      cartRow.innerText = `${item.title} | ${item.amount} | $${item.price}`;
+      cartRow.className = `item`;
+      cartRow.id = `${item.id}`;
       cartRow.onclick = () => {
         if (item.amount > 0) {
           item.amount--;
@@ -94,34 +129,32 @@ function createPriceAmount(arr) {
   let cartItems = 0;
   let sum = 0;
   price.innerHTML = "";
-  breakdown.innerHTML = "";
-  let receipt = "";
-  arr.forEach((item) => {
-    console.log(item);
-    if (item.amount > 0) {
-      cartItems++;
-      receipt += `<div>
-      ${item.title}   | ${item.amount} |           $${item.price} 
-        </div>`;
-    }
-  });
 
   arr.forEach((item) => {
     if (item.amount > 0) {
+      cartItems++;
       sum += item.amount * item.price;
     }
   });
 
+  console.log(cartItems);
+  if (cartItems === 0) {
+    clear.className = "cart-empty";
+    itemsCart.className = "cart-empty";
+  } else {
+    clear.className = "clear-noDis";
+    itemsCart.className = "container";
+  }
   if (cartItems > 4 || Boolean(arr.filter((item) => item.amount > 4)[0])) {
     console.log("you got a discount");
     sum = sum * 0.9;
+    document.getElementById("discount").className = "discount";
+    clear.className = "clear";
+  } else {
+    document.getElementById("discount").className = "cart-empty";
   }
-
-  let receiptRow = document.createElement("div");
-  receiptRow.innerHTML = `${receipt}`;
-  breakdown.appendChild(receiptRow);
   let priceRow = document.createElement("div");
-  priceRow.innerHTML = `Sum: $${sum}`;
+  priceRow.innerHTML = `Sum: $${Math.round(sum)}`;
   price.appendChild(priceRow);
 }
 

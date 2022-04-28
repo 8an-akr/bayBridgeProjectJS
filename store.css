@@ -9,7 +9,7 @@ li {
 }
 
 .container {
-  background-color: rgb(137, 54, 54);
+  background-color: rgba(171, 169, 169, 0.722);
   border-radius: 2rem;
   display: flex;
   flex-direction: column;

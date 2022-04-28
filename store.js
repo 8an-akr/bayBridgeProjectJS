@@ -1,6 +1,7 @@
 const itemsUl = document.getElementById("items");
 const cartUl = document.getElementById("cart");
 const price = document.getElementById("payment");
+const breakdown = document.getElementById("payment-breakdown");
 
 function createItem(barcod, name, price, quantity, amount = 0) {
   return {
@@ -64,14 +65,27 @@ function createCartList(arr) {
 
 function createPriceAmount(arr) {
   price.innerHTML = "";
+  breakdown.innerHTML = "";
+  let receipt = "";
+  arr.forEach((item) => {
+    console.log(item);
+    if (item.amount > 0) {
+      receipt += `<div>
+      ${item.name}   ${item.amount}           $${item.price} 
+        </div>`;
+    }
+  });
   let sum = 0;
   arr.forEach((item) => {
     if (item.amount > 0) {
       sum += item.amount * item.price;
     }
   });
+  let receiptRow = document.createElement("div");
+  receiptRow.innerHTML = `${receipt}`;
+  price.appendChild(receiptRow);
   let priceRow = document.createElement("div");
-  priceRow.innerHTML = `$${sum}`;
+  priceRow.innerHTML = `Sum: $${sum}`;
   price.appendChild(priceRow);
 }
 

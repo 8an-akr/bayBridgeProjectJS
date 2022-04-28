@@ -137,7 +137,6 @@ function createPriceAmount(arr) {
     }
   });
 
-  console.log(cartItems);
   if (cartItems === 0) {
     clear.className = "cart-empty";
     itemsCart.className = "cart-empty";
@@ -146,7 +145,6 @@ function createPriceAmount(arr) {
     itemsCart.className = "container";
   }
   if (cartItems > 4 || Boolean(arr.filter((item) => item.amount > 4)[0])) {
-    console.log("you got a discount");
     sum = sum * 0.9;
     document.getElementById("discount").className = "discount";
     clear.className = "clear";
